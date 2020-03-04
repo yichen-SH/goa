@@ -34,6 +34,25 @@ func RunDSL(t *testing.T, dsl func()) *expr.RootExpr {
 	return expr.Root
 }
 
+// RunDSLB returns the DSL root resulting from running the given DSL.
+func RunDSLB(b *testing.B, dsl func()) *expr.RootExpr {
+	b.Helper()
+	eval.Reset()
+	expr.Root = new(expr.RootExpr)
+	expr.Root.GeneratedTypes = &expr.GeneratedRoot{}
+	eval.Register(expr.Root)
+	eval.Register(expr.Root.GeneratedTypes)
+	expr.Root.API = expr.NewAPIExpr("test api", func() {})
+	expr.Root.API.Servers = []*expr.ServerExpr{expr.Root.API.DefaultServer()}
+	if !eval.Execute(dsl, nil) {
+		b.Fatal(eval.Context.Error())
+	}
+	if err := eval.RunDSL(); err != nil {
+		b.Fatal(err)
+	}
+	return expr.Root
+}
+
 // RunDSLWithFunc returns the DSL root resulting from running the given DSL.
 // It executes a function to add any top-level types to the design Root before
 // running the DSL.

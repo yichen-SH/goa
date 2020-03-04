@@ -42,15 +42,18 @@ func NewMappedAttributeExpr(att *AttributeExpr) *MappedAttributeExpr {
 		validation *ValidationExpr
 	)
 	if att.Validation != nil {
-		validation = att.Validation.Dup()
+		//validation = att.Validation.Dup()
+		validation = att.Validation
 	} else if ut, ok := att.Type.(UserType); ok {
 		if val := ut.Attribute().Validation; val != nil {
-			validation = val.Dup()
+			//validation = val.Dup()
+			validation = val
 		}
 	}
 	ma := &MappedAttributeExpr{
 		AttributeExpr: &AttributeExpr{
-			Type:         Dup(att.Type),
+			//Type: Dup(att.Type),
+			Type:         att.Type,
 			References:   att.References,
 			Bases:        att.Bases,
 			Description:  att.Description,
