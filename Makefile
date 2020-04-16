@@ -23,12 +23,12 @@ GOPATH=$(shell go env GOPATH)
 # Only list test and build dependencies
 # Standard dependencies are installed via go get
 DEPEND=\
+	github.com/golang/protobuf/protoc-gen-go \
+	github.com/hashicorp/go-getter/cmd/go-getter \
 	golang.org/x/lint/golint \
 	golang.org/x/tools/cmd/goimports \
-	github.com/golang/protobuf/protoc-gen-go \
-	github.com/golang/protobuf/proto \
-	honnef.co/go/tools/cmd/staticcheck \
-	github.com/hashicorp/go-getter/cmd/go-getter
+	google.golang.org/protobuf/proto \
+	honnef.co/go/tools/cmd/staticcheck
 
 all: lint test
 
@@ -64,7 +64,7 @@ depend:
 
 lint:
 ifneq ($(GOOS),windows)
-	@if [ "`goimports -l $(GO_FILES) | tee /dev/stderr`" ]; then \
+	@if [ "`goimports -l $(GO_FILES) | grep -v ".pb.go" | tee /dev/stderr`" ]; then \
 		echo "^ - Repo contains improperly formatted go files" && echo && exit 1; \
 	fi
 	@if [ "`golint ./... | grep -vf .golint_exclude | tee /dev/stderr`" ]; then \
